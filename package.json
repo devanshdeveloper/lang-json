@@ -2,10 +2,10 @@
   "name": "lang-json",
   "version": "1.0.0",
   "description": "A lib for templating json",
-  "main": "dist/esm/index.js",
-  "module": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
-  "type":  "module",
+  "main": "dist/esm/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/esm/src/index.d.ts",
+  "type": "module",
   "scripts": {
     "build:cjs": "tsc --outDir dist/cjs --module commonjs",
     "build:esm": "tsc --outDir dist/esm --module esnext",
@@ -13,7 +13,9 @@
     "watch:cjs": "tsc --outDir dist/cjs --module commonjs --watch",
     "watch:esm": "tsc --outDir dist/esm --module esnext --watch",
     "watch": "npm run watch:esm & npm run watch:cjs",
-    "publish": "git add . && git commit -m /\"code updated\"/ && git push && npm publish"
+    "publish": "git add . && git commit -m /\"code updated\"/ && git push && npm publish",
+    "test": "jest",
+    "dev": "nodemon dist/esm/src/index.js"
   },
   "repository": {
     "type": "git",
@@ -26,9 +28,17 @@
   ],
   "author": "Devansh Khetwani",
   "license": "MIT",
-  "dependencies": {
-    "typescript": "^5.0.0"
-  },
   "devDependencies": {
+    "@babel/preset-env": "^7.25.8",
+    "@babel/preset-typescript": "^7.25.7",
+    "@types/is": "^0.0.25",
+    "@types/jest": "^29.5.13",
+    "babel-jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@devanshdeveloper/is-this": "^1.1.6"
   }
 }
