@@ -1,6 +1,6 @@
 {
   "name": "lang-json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lib for templating json",
   "main": "dist/esm/src/index.js",
   "module": "dist/esm/src/index.js",
