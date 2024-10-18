@@ -184,7 +184,7 @@ class IsThis {
   }
 
   isNumberString(value: any): boolean {
-    return this.isString(value) && !isNaN(parseInt(value));
+    return this.isString(value) && !this.isEmptyString(value) && !isNaN(+value);
   }
 
   isBooleanString(value: any): boolean {

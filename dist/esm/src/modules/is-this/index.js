@@ -137,7 +137,7 @@ class IsThis {
         return this.isString(value) && value.trim().length === 0;
     }
     isNumberString(value) {
-        return this.isString(value) && !isNaN(parseInt(value));
+        return this.isString(value) && !this.isEmptyString(value) && !isNaN(+value);
     }
     isBooleanString(value) {
         return this.isString(value) && (value === "true" || value === "false");

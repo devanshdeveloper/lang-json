@@ -1,6 +1,6 @@
 {
   "name": "lang-json",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lib for templating json",
   "main": "dist/esm/src/index.js",
   "module": "dist/esm/src/index.js",
@@ -15,16 +15,34 @@
     "watch": "npm run watch:esm & npm run watch:cjs",
     "publish": "git add . && git commit -m /\"code updated\"/ && git push && npm publish",
     "test": "jest",
-    "dev": "nodemon dist/esm/src/index.js"
+    "dev": "nodemon index.ts"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/devanshdeveloper/json-template.git"
   },
   "keywords": [
-    "docx",
-    "utility",
-    "javascript"
+    "langjson",
+    "template-engine",
+    "templating",
+    "javascript",
+    "json",
+    "dynamic-templates",
+    "string-manipulation",
+    "data-binding",
+    "helpers",
+    "conditional-helpers",
+    "array-manipulation",
+    "object-manipulation",
+    "string-functions",
+    "math-functions",
+    "date-formatting",
+    "performance-optimization",
+    "front-end",
+    "back-end",
+    "unit-testing",
+    "jest",
+    "open-source"
   ],
   "author": "Devansh Khetwani",
   "license": "MIT",

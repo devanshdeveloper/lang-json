@@ -1,5 +1,4 @@
-// import isThis from "@devanshdeveloper/is-this";
-import isThis from "./modules/is-this/index";
+import isThis from "@devanshdeveloper/is-this";
 class MemoryAddresses {
     storage = {};
     // Helper function to generate a random string key
@@ -48,7 +47,7 @@ export default class LangJSON {
                 }
                 return result;
             },
-            loop: (number, data, innerTemplate) => {
+            loop: ([number], data, innerTemplate) => {
                 const result = [];
                 for (let i = 0; i < number; i++) {
                     result.push(this.applyTemplate(innerTemplate, {
@@ -74,8 +73,6 @@ export default class LangJSON {
             endsWith: ([str, suffix]) => str.endsWith(suffix),
             reverseString: ([str]) => str.split("").reverse().join(""),
             isEmpty: ([str]) => !str || str.length === 0,
-            formatPhoneNumber: ([number]) => number.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3"),
-            toTitleCase: ([str]) => str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase()),
             repeat: ([str, times]) => str.repeat(times),
             // Mathematical Helpers
             add: ([a, b]) => a + b,
@@ -100,15 +97,15 @@ export default class LangJSON {
             arrayLength: ([arr]) => arr.length,
             arrayIncludes: ([arr, item]) => arr.includes(item),
             arrayJoin: ([arr, separator]) => arr.join(separator),
-            arrayMap: ([arr, fn]) => arr.map(fn),
-            arrayFilter: ([arr, fn]) => arr.filter(fn),
-            arrayReduce: ([arr, fn, initial]) => arr.reduce(fn, initial),
+            // arrayMap: ([arr, fn]): any => arr.map(fn),
+            // arrayFilter: ([arr, fn]): any => arr.filter(fn),
+            // arrayReduce: ([arr, fn, initial]): any => arr.reduce(fn, initial),
             uniqueArray: ([arr]) => [...new Set(arr)],
             flattenArray: ([arr]) => arr.flat(),
-            arraySort: ([arr, compareFn]) => arr.sort(compareFn),
-            arrayFind: ([arr, fn]) => arr.find(fn),
-            arrayEvery: ([arr, fn]) => arr.every(fn),
-            arraySome: ([arr, fn]) => arr.some(fn),
+            // arraySort: ([arr, compareFn]): any => arr.sort(compareFn),
+            // arrayFind: ([arr, fn]): any => arr.find(fn),
+            // arrayEvery: ([arr, fn]): any => arr.every(fn),
+            // arraySome: ([arr, fn]): any => arr.some(fn),
             // Object Helpers
             objectKeys: ([obj]) => Object.keys(obj),
             objectValues: ([obj]) => Object.values(obj),
@@ -202,25 +199,32 @@ export default class LangJSON {
         return template;
     }
     lookup(varPath, data) {
+        // console.log({ varPath });
         if (typeof varPath !== "string")
             return varPath;
-        let normalizedPath = varPath.replace(/\[(\d+)\]/g, ".$1");
+        let normalizedPath = varPath.replace(/\[(\d+)\]|\["(.*?)"\]/g, ".$1$2");
         if (normalizedPath.startsWith(".")) {
             normalizedPath = normalizedPath.slice(1);
         }
         let path = normalizedPath.split(".");
         const returnValue = path.reduce((acc, part) => {
+            part = part.replace(/^(['"])([\s\S]*?)\1$/g, (_, __, innerText) => innerText);
+            // console.log({ path, acc, part });
             return acc?.[part];
         }, data);
+        // console.log({ returnValue });
         return returnValue;
     }
     sanitizeArg(arg, helperName, data) {
-        if (helperName === "var")
+        const isString = arg.match(/^(['"])([\s\S]*?)\1$/g);
+        if (helperName === "var" && !isString)
             return arg;
-        if (arg.match(/^(['"])([\s\S]*?)\1$/g)) {
+        if (isString) {
+            // console.log({ arg, message: "into qoutes string" });
             return arg.replace(/^(['"])([\s\S]*?)\1$/g, (_, __, innerText) => innerText);
         }
         if (isThis.isNumberString(arg)) {
+            // console.log({ arg, message: "into number string" });
             return Number(arg);
         }
         if (isThis.isBooleanString(arg)) {
@@ -257,7 +261,6 @@ export default class LangJSON {
                 else if (currentQuote === null) {
                     currentQuote = char;
                 }
-                continue;
             }
             currentPart += char;
         }
@@ -278,12 +281,14 @@ export default class LangJSON {
                 throw new Error("Missing helper: " + helperName);
             }
             const splittedArgs = helperArgsArray.map((e) => this.sanitizeArg(e, helperName, data));
+            // console.log({ helperName, helperArgs, helperArgsArray, splittedArgs });
             let helperResult = helper(splittedArgs, data, innerTemplate);
-            // console.log({ helperName, helperArgs, splitedInnerArgs, helperResult });
+            // console.log({ helperResult });
+            let memorykey = null;
             if (isThis.isArrayOrObject(helperResult)) {
-                helperResult = this.memory.storeData(helperResult);
+                memorykey = this.memory.storeData(helperResult);
             }
-            const returnValue = helperArgs.replace(helperArgsMatches[0], `"${helperResult}"`);
+            const returnValue = helperArgs.replace(helperArgsMatches[0], memorykey ? memorykey : `"${helperResult}"`);
             return this.processHelperArgs(returnValue, data, innerTemplate);
         }
         else {
@@ -351,65 +356,14 @@ export default class LangJSON {
     }
 }
 // const langJson = new LangJSON();
-// langJson.registerHelpers({
-//   upper: ([str]) => str.toUpperCase(),
-//   lower: ([str]) => str.toLowerCase(),
-//   isTrue: ([arg]) => arg === "true",
-//   getLength: ([arr]) => arr.length,
-// });
-// // Define a complex data structure
-// const data = {
-//   user: {
-//     name: "Alice",
-//     age: 30,
-//     roles: ["admin", "editor"],
-//     address: {
-//       city: "Wonderland",
-//       zip: "12345",
-//       coordinates: { lat: 51.5074, long: -0.1278 },
-//     },
-//     preferences: {
-//       notifications: { email: true, sms: false },
-//       theme: "dark",
-//     },
-//   },
-//   isActive: "true",
-//   items: [
-//     { id: 1, name: "Item1", description: "First Item" },
-//     { id: 2, name: "Item2", description: "Second Item" },
-//     { id: 3, name: "Item3", description: "Third Item" },
-//   ],
-// };
-// // // Define a complex template
 // const template = {
-//   "{{#upper user.name}}": {
-//     age: "{{#var user.age}}",
-//     active: "{{#isTrue isActive}}",
-//     address: {
-//       city: "{{#var user.address.city}}",
-//       zip: "{{#var user.address.zip}}",
-//       coordinates:
-//         "{{#var user.address.coordinates.lat}}, {{#var user.address.coordinates.long}}",
-//     },
-//     roles: {
-//       "{{#arrayJoin (var user.roles) ', '}}": {
-//         roleCount: "{{#getLength user.roles}}",
-//         roleList: "{{#var user.roles[0]}} and {{#var user.roles[1]}}",
-//       },
-//     },
-//     items: "{{#repeat (concat 'Item: ' (var items[0].name) ' ') 3}}",
-//     preferences: {
-//       theme: "{{#var user.preferences.theme}}",
-//       notificationStatus: {
-//         email: "{{#var user.preferences.notifications.email}}",
-//         sms: "{{#var user.preferences.notifications.sms}}",
-//       },
-//     },
-//   },
+//   "{{#loop items.length}}": { name: "{{#var items[(var index)]}}" },
 // };
-// const result = langJson.applyTemplate(template, data);
+// const result = langJson.applyTemplate(template, {
+//   items: ["Apple", "Banana", "Grapes"],
+// });
 // const returnValue = {
 //   1: result,
 // };
-// console.log(JSON.stringify({ returnValue }, null, 2));
+// console.log(JSON.stringify(returnValue, null, 2));
 //# sourceMappingURL=index.js.map

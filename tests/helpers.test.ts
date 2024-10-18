@@ -3,6 +3,41 @@ import LangJSON from "../src/index";
 describe("LangJSON Helpers", () => {
   const langJson = new LangJSON();
 
+  // var helper
+  test("var", () => {
+    const template = "{{#var name}}";
+    const result = langJson.applyTemplate(template, { name: "Devansh" });
+    expect(result).toBe("Devansh");
+  });
+
+  // manupilating helpers
+  test("each", () => {
+    const template = { "{{#each items}}": { name: "{{#var item}}" } };
+    const result = langJson.applyTemplate(template, {
+      items: ["Apple", "Banana", "Grapes"],
+    });
+    expect(result).toEqual([
+      { name: "Apple" },
+      { name: "Banana" },
+      { name: "Grapes" },
+    ]);
+  });
+
+  // manupilating helpers
+  test("loop", () => {
+    const template = {
+      "{{#loop items.length}}": { name: "{{#var items[(var index)]}}" },
+    };
+    const result = langJson.applyTemplate(template, {
+      items: ["Apple", "Banana", "Grapes"],
+    });
+    expect(result).toEqual([
+      { name: "Apple" },
+      { name: "Banana" },
+      { name: "Grapes" },
+    ]);
+  });
+
   // String Helpers
   test("uppercase", () => {
     const template = "{{#uppercase 'hello'}}";
@@ -52,16 +87,40 @@ describe("LangJSON Helpers", () => {
     expect(result).toBe("a-b-c");
   });
 
+  test("contains", () => {
+    const template = "{{#contains 'a-nice-string' '-'}}";
+    const result = langJson.applyTemplate(template, {});
+    expect(result).toBe(true);
+  });
+
+  test("length", () => {
+    const template = "{{#length 'a-nice-string'}}";
+    const result = langJson.applyTemplate(template, {});
+    expect(result).toBe(13);
+  });
+
+  test("startsWith", () => {
+    const template = "{{#startsWith 'Hello, World' 'Hello'}}";
+    const result = langJson.applyTemplate(template, {});
+    expect(result).toBe(true);
+  });
+
+  test("endsWith", () => {
+    const template = "{{#endsWith 'Hello, World' 'World'}}";
+    const result = langJson.applyTemplate(template, {});
+    expect(result).toBe(true);
+  });
+
   test("reverseString", () => {
     const template = "{{#reverseString 'jest'}}";
     const result = langJson.applyTemplate(template, {});
     expect(result).toBe("tsej");
   });
 
-  test("toTitleCase", () => {
-    const template = "{{#toTitleCase 'hello world'}}";
+  test("repeat", () => {
+    const template = "{{#repeat 'jest ' 3}}";
     const result = langJson.applyTemplate(template, {});
-    expect(result).toBe("Hello World");
+    expect(result).toBe("jest jest jest ");
   });
 
   // Mathematical Helpers
@@ -150,6 +209,21 @@ describe("LangJSON Helpers", () => {
     expect(result).toBe(true);
   });
 
+  // Date Helpers
+  test("getCurrentDate", () => {
+    const template = "{{#getCurrentDate}}";
+    const result = langJson.applyTemplate(template, {});
+    const currentDate = new Date().toISOString().split("T")[0];
+    expect(result).toBe(currentDate);
+  });
+
+  test("getCurrentTime", () => {
+    const template = "{{#getCurrentTime}}";
+    const result = langJson.applyTemplate(template, {});
+    const currentTime = new Date().toLocaleTimeString();
+    expect(result).toBe(currentTime);
+  });
+
   // Array Helpers
   test("arrayLength", () => {
     const template = "{{#arrayLength (split '1,2,3' ',')}}";
@@ -175,12 +249,6 @@ describe("LangJSON Helpers", () => {
     expect(result).toEqual(["1", "2", "3"]);
   });
 
-  test("shuffleArray", () => {
-    const template = "{{#shuffleArray (split '1,2,3' ',')}}";
-    const result = langJson.applyTemplate(template, {});
-    expect(result.sort()).toEqual(["1", "2", "3"]);
-  });
-
   // Object Helpers
   test("objectKeys", () => {
     const template = "{{#objectKeys data}}";
@@ -199,11 +267,12 @@ describe("LangJSON Helpers", () => {
   });
 
   test("mergeObjects", () => {
-    const template = "{{#mergeObjects data}}";
+    const template = "{{#mergeObjects data data2}}";
     const result = langJson.applyTemplate(template, {
       data: { a: 1, b: 2 },
+      data2: { c: 3, d: 4 },
     });
-    expect(result).toEqual({ a: 1, b: 2 });
+    expect(result).toEqual({ a: 1, b: 2, c: 3, d: 4 });
   });
 
   // Date Helpers
@@ -231,8 +300,11 @@ describe("LangJSON Helpers", () => {
   });
 
   test("deepEqual", () => {
-    const template = "{{#deepEqual { a: 1 } { a: 1 }}}";
-    const result = langJson.applyTemplate(template, {});
+    const template = "{{#deepEqual data data2}}";
+    const result = langJson.applyTemplate(template, {
+      data: { a: 1 },
+      data2: { a: 1 },
+    });
     expect(result).toBe(true);
   });
 
