@@ -1,6 +1,6 @@
 {
   "name": "lang-json",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A lib for templating json",
   "main": "dist/esm/src/index.js",
   "module": "dist/esm/src/index.js",
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/devanshdeveloper/json-template.git"
+    "url": "https://github.com/devanshdeveloper/lang-json.git"
   },
   "keywords": [
     "langjson",
